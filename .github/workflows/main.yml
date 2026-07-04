@@ -1,0 +1,70 @@
+name: Build and Sign
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      sign:
+        description: 'Sign the build'
+        required: false
+        default: true
+        type: boolean
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build Release
+      run: dotnet build --configuration Release --no-restore
+      
+    - name: Setup Inno Setup
+      uses: jldeen/setup-inno@v1
+      with:
+        version: 6.3.3
+        
+    - name: Build Installer
+      run: |
+        cd installer
+        build_inno_installer.bat
+        
+    - name: Sign EXE with GitHub Trusted Signing
+      if: github.event.inputs.sign == 'true'
+      uses: github/trusted-signing-action@v1
+      with:
+        certificate: ${{ secrets.AZURE_CERTIFICATE }}
+        certificate-password: ${{ secrets.AZURE_CERTIFICATE_PASSWORD }}
+        endpoint: ${{ secrets.AZURE_ENDPOINT }}
+        folder: bin/Release/net48
+        digest-algorithm: sha256
+        
+    - name: Sign Installer with GitHub Trusted Signing
+      if: github.event.inputs.sign == 'true'
+      uses: github/trusted-signing-action@v1
+      with:
+        certificate: ${{ secrets.AZURE_CERTIFICATE }}
+        certificate-password: ${{ secrets.AZURE_CERTIFICATE_PASSWORD }}
+        endpoint: ${{ secrets.AZURE_ENDPOINT }}
+        file: installer/installer_output/KOZAK_RP_Launcher_Setup_v3.9.exe
+        digest-algorithm: sha256
+        
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: signed-build
+        path: |
+          bin/Release/net48/*.exe
+          installer/installer_output/*.exe
