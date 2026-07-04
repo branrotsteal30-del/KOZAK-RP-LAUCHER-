@@ -32,9 +32,10 @@ jobs:
       run: dotnet build --configuration Release --no-restore
       
     - name: Setup Inno Setup
-      uses: jldeen/setup-inno@v1
-      with:
-        version: 6.3.3
+      run: |
+        Invoke-WebRequest -Uri "https://files.jrsoftware.org/is/6/isetup-6.3.3.exe" -OutFile "inno_setup.exe"
+        Start-Process -FilePath "inno_setup.exe" -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /DIR=C:\InnoSetup" -Wait
+        $env:Path = "C:\InnoSetup;$env:Path"
         
     - name: Build Installer
       run: |
