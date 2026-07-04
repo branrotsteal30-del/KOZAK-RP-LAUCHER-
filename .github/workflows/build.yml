@@ -1,16 +1,7 @@
-name: Build and Sign
+name: Build
 
 on:
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
-    inputs:
-      sign:
-        description: 'Sign the build'
-        required: false
-        default: false
-        type: boolean
 
 jobs:
   build:
@@ -31,21 +22,8 @@ jobs:
     - name: Build Release
       run: dotnet build --configuration Release --no-restore
       
-    - name: Setup Inno Setup
-      run: |
-        Invoke-WebRequest -Uri "https://files.jrsoftware.org/is/6/isetup-6.3.3.exe" -OutFile "inno_setup.exe"
-        Start-Process -FilePath "inno_setup.exe" -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /DIR=C:\InnoSetup" -Wait
-        $env:Path = "C:\InnoSetup;$env:Path"
-        
-    - name: Build Installer
-      run: |
-        cd installer
-        build_inno_installer.bat
-        
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: build
-        path: |
-          bin/Release/net48/*.exe
-          installer/installer_output/*.exe
+        path: bin/Release/net48/*.exe
