@@ -1,0 +1,70 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <AssemblyName>KOZAK RP</AssemblyName>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <OutputType>WinExe</OutputType>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <TargetFramework>net48</TargetFramework>
+    <Prefer32Bit>true</Prefer32Bit>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <RootNamespace></RootNamespace>
+    <Nullable>disable</Nullable>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <SignAssembly>false</SignAssembly>
+    <DelaySign>false</DelaySign>
+    <PublisherName>KOZAK RP</PublisherName>
+    <Product>KOZAK RP Launcher</Product>
+    <Company>KOZAK RP</Company>
+    <Copyright>© KOZAK RP, 2026</Copyright>
+    <Description>Official launcher for KOZAK RP multiplayer server</Description>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE;RELEASE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+
+  <Target Name="SignAssembly" AfterTargets="AfterBuild" Condition="'$(SignAssembly)' == 'true' And Exists('$(AssemblyOriginatorKeyFile)')">
+    <Exec Command="signtool sign /f &quot;$(AssemblyOriginatorKeyFile)&quot; /p $(CertificatePassword) /t http://timestamp.digicert.com /fd sha256 &quot;$(TargetPath)&quot;" />
+  </Target>
+
+  <ItemGroup>
+    <Compile Remove="Microsoft.VisualStudio.Text.UI\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Resources.Extensions" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="*.png" />
+    <Resource Include="*.ttf" />
+    <Resource Include="launcher2_ukraine_gta.mainwindow.baml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="launcher2_ukraine_gta.Properties.Resources.resx" />
+    <EmbeddedResource Include="costura*.compressed">
+      <LogicalName>%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="costura.metadata">
+      <LogicalName>%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <None Include="fodyweavers.xml" />
+  </ItemGroup>
+</Project>
